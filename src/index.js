@@ -56,7 +56,7 @@ const system = async function * (opts, target, info) {
       if (typeof call.target === 'string') {
         let last
         let _getcall = { method: 'get', args: { path: call.target } }
-        for await (let trace of system(opts, new MapKind(call.target.node), _getcall)) {
+        for await (let trace of system(opts, new MapKind(origin.node), _getcall)) {
           last = trace
           yield trace
         }
@@ -84,7 +84,10 @@ const system = async function * (opts, target, info) {
   }
 }
 
-const byteRead = async function * (opts, target, start, end) {
+// Note: this is named "read" because it's a high level
+// filtered version of the "read" operation. this, along
+// with similar functions should maybe go in an "ops" file.
+const read = async function * (opts, target, start, end) {
   let info = { method: 'read', args: { start, end } }
   for await (let line of system(opts, target, info)) {
     if (line.trace === 'type' && line.leaf && Buffer.isBuffer(line.node)) yield line.node
@@ -94,4 +97,4 @@ const byteRead = async function * (opts, target, start, end) {
 exports.Type = Type
 exports.Lookup = Lookup
 exports.system = system
-exports.byteRead = byteRead
+exports.read = read

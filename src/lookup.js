@@ -1,6 +1,7 @@
 const kinds = require('./kinds')
 const CID = require('cids')
 
+// Note: I don't like calling this lookup everywhere, should find better name
 class Lookup {
   constructor (opts) {
     this.opts = opts
@@ -12,7 +13,7 @@ class Lookup {
   fromNode (node) {
     let _Class = this._types[node._type]
     if (!_Class) throw new Error(`No type registered named "${node._type}"`)
-    return new _Class(node, lookup) 
+    return new _Class(node, this) 
   }
   fromKind (source) {
     if (source._type) return this.fromNode(source)

@@ -1,9 +1,9 @@
 const withIs = require('class-is')
 
 class BaseType {
-  constructor (node, opts) {
+  constructor (node, lookup) {
     this.node = node
-    this.opts = opts
+    this.lookup = lookup
   }
 }
 

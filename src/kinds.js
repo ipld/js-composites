@@ -10,7 +10,7 @@ class MapKind extends Type {
       let attr = path.shift()
       if (typeof value[attr] === 'undefined') throw new Error(`Not Found. Node has no attribute "${attr}"`)
       value = value[attr]
-      if (CID.isCID(value)) {
+      if (CID.isCID(value) && path.length) {
         return { call: { info: { method: 'get', args: { path: path.join('/') } }, target: value, proxy: true } }
       }
     }

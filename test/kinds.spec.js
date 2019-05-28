@@ -1,7 +1,7 @@
 const Block = require('@ipld/block')
 const assert = require('assert')
 const tsame = require('tsame')
-const { system, Lookup, byteRead } = require('../')
+const { system, Lookup, read } = require('../')
 
 const same = (...args) => assert.ok(tsame(...args))
 const test = it
@@ -69,7 +69,7 @@ test('single block bytes read', async () => {
   let block = Block.encoder({hello: Buffer.from('world')}, 'dag-json')
   let result = await getResult(system({lookup}, block, _getCall('hello')))
   same(result.kind, 'bytes')
-  let trace = await asyncList(byteRead({lookup}, result))
+  let trace = await asyncList(read({lookup}, result))
   same(trace.length, 1)
   same(trace[0].toString(), 'world')
 })
