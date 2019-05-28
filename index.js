@@ -109,20 +109,6 @@ const system = async function * (opts, target, info = {}) {
   }
 }
 
-const path = async (path, root, opts) => {
-  path = path.split('/').filter(x => x)
-  let result = root
-  while (path.length) {
-    let attr = path.shift()
-    let last
-    for await (let trace of system(opts, result, { method: 'get', attr })) {
-      last = trace
-    }
-    result = last.result
-  }
-  return result
-}
-
 exports.Type = Type
 exports.Lookup = Lookup
 exports.path = path
