@@ -11,7 +11,7 @@ class MapKind extends Type {
       if (typeof value[attr] === 'undefined') throw new Error(`Not Found. Node has no attribute "${attr}"`)
       value = value[attr]
       if (CID.isCID(value)) {
-        return { call: { method: 'get', args: { path: path.join('/') } }, target: value, proxy: true }
+        return { call: { info: { method: 'get', args: { path: path.join('/') } }, target: value, proxy: true } }
       }
     }
     return { result: value }

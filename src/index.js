@@ -2,6 +2,7 @@ const Type = require('./base')
 const Lookup = require('./lookup')
 const CID = require('cids')
 const Block = require('@ipld/block')
+const { MapKind } = require('./kinds')
 
 const system = async function * (opts, target, info) {
   /* target resolution */
@@ -41,20 +42,42 @@ const system = async function * (opts, target, info) {
     }
     let response = await target[info.method](info.args)
     yield { response, target, call: info, result: response.result }
-    if (response.call) {
-      if (response.proxy) {
-        yield * system(opts, response.target, response.call)
-      } else {
-        info.continuation = response.continuation || {}
+
+    /* type method calls from types */
+    let calls
+    if (response.call) calls = [ response.call ]
+    else if (response.calls) calls = response.calls
+    else calls = []
+    
+    for (let call of calls) {
+      let origin = target
+
+      /* resolve local path lookup for target */
+      if (typeof call.target === 'string') {
         let last
-        for await (let trace of system(opts, response.target, response.call)) {
+        let _getcall = { method: 'get', args: { path: call.target } }
+        for await (let trace of system(opts, new MapKind(call.target.node), _getcall)) {
+          last = trace
+          yield trace
+        }
+        call.target = last
+      }
+
+      if (call.proxy) {
+        yield * system(opts, call.target, call.info)
+      } else {
+        info.continuation = info.continuation || {}
+        let last
+        for await (let trace of system(opts, call.target, call.info)) {
           last = trace
           yield trace
         }
         info.continuation.response = last
-        yield * system(opts, target, info)
+        yield * system(opts, origin, info)
       }
-    } 
+    }
+    
+    /* run results through resolution and link unfolding */
     if (response.result) {
       yield * system(opts, response.result)
     }
