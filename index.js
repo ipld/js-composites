@@ -32,13 +32,31 @@ class MapKind extends Type {
 }
 
 class LinkKind extends Type {
+  get kind () {
+    return 'link'
+  }
   resolve (args) {
     return { result: this.node }
   }
 }
 class StringKind extends Type {
+  get kind () {
+    return 'string'
+  }
   toString (args) {
     return this.node
+  }
+}
+class BytesKind extends Type {
+  get kind () {
+    return 'bytes'
+  }
+  read (args) {
+    let start = args.start || 0
+    let end = args.end || this.node.length
+    console.log(this.node, start, end)
+    if (start === 0 && end === this.node.length) return { result: this.node }
+    else return { result: this.node.slice(start, end) }
   }
 }
 
@@ -51,29 +69,35 @@ class Lookup {
   fromKind (source) {
     if (source._type) return this.fromNode(source)
     if (CID.isCID(source)) return new LinkKind(source)
+    if (Buffer.isBuffer(source)) return new BytesKind(source)
     if (source && typeof source === 'object') return new MapKind(source)
     if (typeof source === 'string') return new StringKind(source)
     throw new Error('NOT IMPLEMENTED!')
   }
 }
 
-const system = async function * (opts, target, info = {}) {
+const system = async function * (opts, target, info) {
+  /* target resolution */
   let block
   if (CID.isCID(target)) {
     block = await opts.get(target)
-    yield { trace: 'getBlock', cid: target, block }
+    yield { trace: 'getBlock', cid: target, block, leaf: !info }
     target = block
   }
   if (Block.isBlock(target)) {
     block = target
     target = target.decode()
-    yield { trace: 'decode', block, result: target }
+    yield { trace: 'decode', block, result: target, leaf: !info }
   }
   if (!Type.isType(target)) {
     let value = target
     target = opts.lookup.fromKind(target)
-    yield { trace: 'type', node: value, result: target }
+    yield { trace: 'type', node: value, result: target, leaf: !info }
   }
+
+  if (!info) info = {}
+
+  /* recursive link unfold */
   if (info.method !== 'resolve' && target.resolve) {
     let last
     for await (let trace of system(opts, target, { method: 'resolve' })) {
@@ -83,6 +107,7 @@ const system = async function * (opts, target, info = {}) {
     target = last.result.result
   }
 
+  /* type method calls */
   if (info.method) {
     if (!target[info.method]) {
       throw new Error(`Type does not implement "${info.method}"`)
@@ -109,7 +134,14 @@ const system = async function * (opts, target, info = {}) {
   }
 }
 
+const byteRead = async function * (opts, target, start, end) {
+  let info = { method: 'read', args: { start, end } }
+  for await (let line of system(opts, target, info)) {
+    if (line.trace === 'type' && line.leaf && Buffer.isBuffer(line.node)) yield line.node
+  }
+}
+
 exports.Type = Type
 exports.Lookup = Lookup
-exports.path = path
 exports.system = system
+exports.byteRead = byteRead
