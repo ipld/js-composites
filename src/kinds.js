@@ -55,4 +55,3 @@ class BytesKind extends Type {
 }
 
 exports.BytesKind = BytesKind
-

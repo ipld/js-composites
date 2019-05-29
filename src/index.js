@@ -48,7 +48,7 @@ const system = async function * (opts, target, info) {
     if (response.call) calls = [ response.call ]
     else if (response.calls) calls = response.calls
     else calls = []
-    
+
     for (let call of calls) {
       let origin = target
 
@@ -76,7 +76,7 @@ const system = async function * (opts, target, info) {
         yield * system(opts, origin, info)
       }
     }
-    
+
     /* run results through resolution and link unfolding */
     if (response.result) {
       yield * system(opts, response.result)

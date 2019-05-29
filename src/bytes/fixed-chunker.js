@@ -3,7 +3,7 @@ const Block = require('@ipld/block')
 
 const mkcall = (path, start, end) => {
   let target = 'data/' + path
-  return { method: 'read', args: {start, end}, target, proxy: true }
+  return { method: 'read', args: { start, end }, target, proxy: true }
 }
 
 const _type = 'IPLD/Experimental/FixedChunker'
@@ -42,7 +42,7 @@ class FixedChunker extends Type {
     return { calls: reads }
   }
 }
-FixedChunker.create = async function * (source, chunkSize=1024, codec='dag-json') {
+FixedChunker.create = async function * (source, chunkSize = 1024, codec = 'dag-json', createList = null) {
   let length
   if (Buffer.isBuffer(source)) {
     length = source.length
@@ -55,10 +55,17 @@ FixedChunker.create = async function * (source, chunkSize=1024, codec='dag-json'
       i += chunkSize
     }
     let data = await Promise.all(cids)
-    yield Block.encoder({ data, length, chunkSize, _type }, codec) 
+    if (createList) {
+      let root
+      for await (let block of createList(data)) {
+        yield block
+        root = block
+      }
+      data = await root.cid()
+    }
+    yield Block.encoder({ data, length, chunkSize, _type }, codec)
   }
 }
 FixedChunker._type = _type
 
 module.exports = FixedChunker
-

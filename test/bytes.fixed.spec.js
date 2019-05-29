@@ -19,7 +19,7 @@ const storage = () => {
     let _cid = cid.toBaseEncodedString()
     kv[_cid] = block
   }
-  return {put, get}
+  return { put, get }
 }
 
 const getResult = async iter => {
@@ -66,7 +66,7 @@ test('basic read', async () => {
     await put(block)
     root = block
   }
-  let reader = read({get, lookup}, root)
+  let reader = read({ get, lookup }, root)
   let parts = await asyncList(reader)
   same(parts.length, 3)
   same(parts[0].toString(), '012')
@@ -74,4 +74,3 @@ test('basic read', async () => {
   same(parts[2].toString(), '678')
   same(parts[3].toString(), '9')
 })
-

@@ -13,7 +13,7 @@ class Lookup {
   fromNode (node) {
     let _Class = this._types[node._type]
     if (!_Class) throw new Error(`No type registered named "${node._type}"`)
-    return new _Class(node, this) 
+    return new _Class(node, this)
   }
   fromKind (source) {
     if (source._type) return this.fromNode(source)
@@ -26,4 +26,3 @@ class Lookup {
 }
 
 module.exports = Lookup
-

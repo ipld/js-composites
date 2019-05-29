@@ -13,4 +13,3 @@ const Type = withIs(BaseType, {
 })
 
 module.exports = Type
-
