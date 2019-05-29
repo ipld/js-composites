@@ -3,7 +3,7 @@ const Block = require('@ipld/block')
 
 const mkcall = (path, start, end) => {
   let target = 'data/' + path
-  return { method: 'read', args: { start, end }, target, proxy: true }
+  return { info: { method: 'read', args: { start, end } }, target, proxy: true }
 }
 
 const _type = 'IPLD/Experimental/FixedChunker'

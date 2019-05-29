@@ -68,7 +68,7 @@ test('basic read', async () => {
   }
   let reader = read({ get, lookup }, root)
   let parts = await asyncList(reader)
-  same(parts.length, 3)
+  same(parts.length, 4)
   same(parts[0].toString(), '012')
   same(parts[1].toString(), '345')
   same(parts[2].toString(), '678')

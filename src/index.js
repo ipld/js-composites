@@ -41,6 +41,7 @@ const system = async function * (opts, target, info) {
       throw new Error(`Type does not implement "${info.method}"`)
     }
     let response = await target[info.method](info.args)
+    if (!response) throw new Error('Type did not return response')
     yield { response, target, call: info, result: response.result }
 
     /* type method calls from types */
@@ -60,8 +61,11 @@ const system = async function * (opts, target, info) {
           last = trace
           yield trace
         }
-        call.target = last
+        call.target = last.result
       }
+
+      if (!call.target) throw new Error('Could not resolve a target.')
+      if (!call.info) throw new Error('Cannot perform call without info')
 
       if (call.proxy) {
         yield * system(opts, call.target, call.info)
