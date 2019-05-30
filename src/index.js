@@ -20,7 +20,7 @@ const system = async function * (opts, target, info) {
   if (!Type.isType(target)) {
     let value = target
     target = opts.lookup.fromKind(target)
-    yield { trace: 'type', node: value, result: target, leaf: !info, _leaf:info }
+    yield { trace: 'type', node: value, result: target, leaf: !info }
   }
 
   if (!info) info = {}
@@ -32,7 +32,7 @@ const system = async function * (opts, target, info) {
       last = trace
       yield trace
     }
-    target = last.result.result
+    target = last.result
   }
 
   /* type method calls */
