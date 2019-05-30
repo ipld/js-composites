@@ -30,7 +30,6 @@ class MaxLengthList extends Type {
       i++
       seen += m
     }
-
   }
 }
 MaxLengthList._type = _type

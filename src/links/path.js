@@ -19,9 +19,8 @@ class PathLink extends Type {
   }
 }
 PathLink.create = (cid, path, codec = 'dag-json') => {
-  return Block.encoder({_type, cid, path}, codec)
+  return Block.encoder({ _type, cid, path }, codec)
 }
 PathLink._type = _type
 
 module.exports = PathLink
-

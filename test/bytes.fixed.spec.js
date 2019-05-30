@@ -1,8 +1,8 @@
-const Block = require('@ipld/block')
+/* globals it */
 const assert = require('assert')
 const tsame = require('tsame')
 const FixedChunker = require('../src/bytes/fixed-chunker')
-const { system, Lookup, read } = require('../')
+const { Lookup, read } = require('../')
 
 const same = (...args) => assert.ok(tsame(...args))
 const test = it
@@ -20,14 +20,6 @@ const storage = () => {
     kv[_cid] = block
   }
   return { put, get }
-}
-
-const getResult = async iter => {
-  let last
-  for await (let part of iter) {
-    last = part
-  }
-  return last.result
 }
 
 const asyncList = async iter => {

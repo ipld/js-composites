@@ -1,8 +1,9 @@
+/* globals it */
 const Block = require('@ipld/block')
 const assert = require('assert')
 const tsame = require('tsame')
 const MaxLengthList = require('../src/lists/max-length')
-const { system, Lookup, get } = require('../')
+const { Lookup, get } = require('../')
 const getPath = get
 
 const same = (...args) => assert.ok(tsame(...args))
@@ -32,10 +33,9 @@ const asyncList = async iter => {
 }
 
 const lookup = new Lookup()
-lookup.register(MaxLengthList._type,  MaxLengthList)
+lookup.register(MaxLengthList._type, MaxLengthList)
 
-let value = Buffer.from('hello world')
-let fixture = Array.from({length: 107}).map((v, k) => Buffer.from('hello world: '+ k))
+let fixture = Array.from({ length: 107 }).map((v, k) => Buffer.from('hello world: ' + k))
 
 test('basic create', async () => {
   let blocks = fixture.map(b => Block.encoder(b, 'raw'))
@@ -57,11 +57,11 @@ test('basic gets', async () => {
     root = block
     await put(block)
   }
-  let result = await getPath({get, lookup}, root, '0')
+  let result = await getPath({ get, lookup }, root, '0')
   let buffer = result.node
   same(buffer.toString(), 'hello world: 0')
 
-  result = await getPath({get, lookup}, root, '106')
+  result = await getPath({ get, lookup }, root, '106')
   buffer = result.node
   same(buffer.toString(), 'hello world: 106')
 })

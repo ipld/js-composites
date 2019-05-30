@@ -1,3 +1,4 @@
+/* globals it */
 const Block = require('@ipld/block')
 const assert = require('assert')
 const tsame = require('tsame')
