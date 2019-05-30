@@ -20,7 +20,7 @@ const system = async function * (opts, target, info) {
   if (!Type.isType(target)) {
     let value = target
     target = opts.lookup.fromKind(target)
-    yield { trace: 'type', node: value, result: target, leaf: !info }
+    yield { trace: 'type', node: value, result: target, leaf: !info, _leaf:info }
   }
 
   if (!info) info = {}
@@ -40,7 +40,7 @@ const system = async function * (opts, target, info) {
     if (!target[info.method]) {
       throw new Error(`Type does not implement "${info.method}"`)
     }
-    let response = await target[info.method](info.args)
+    let response = await target[info.method](info.args, info.continuation)
     if (!response) throw new Error('Type did not return response')
     yield { response, target, call: info, result: response.result }
 
@@ -56,7 +56,7 @@ const system = async function * (opts, target, info) {
       /* resolve local path lookup for target */
       if (typeof call.target === 'string') {
         let last
-        let _getcall = { method: 'get', args: { path: call.target } }
+        let _getcall = { method: 'get', args: { path: call.target }, local: true }
         for await (let trace of system(opts, new MapKind(origin.node), _getcall)) {
           last = trace
           yield trace
@@ -70,7 +70,8 @@ const system = async function * (opts, target, info) {
       if (call.proxy) {
         yield * system(opts, call.target, call.info)
       } else {
-        info.continuation = info.continuation || {}
+        info.continuation = call.info.continuation || {}
+        delete call.info.continuation
         let last
         for await (let trace of system(opts, call.target, call.info)) {
           last = trace
@@ -83,7 +84,7 @@ const system = async function * (opts, target, info) {
 
     /* run results through resolution and link unfolding */
     if (response.result) {
-      yield * system(opts, response.result)
+      yield * system(opts, response.result, info.local ? {} : undefined)
     }
   }
 }
