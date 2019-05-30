@@ -84,6 +84,7 @@ const system = async function * (opts, target, info) {
 
     /* run results through resolution and link unfolding */
     if (response.result) {
+      /* local calls from other types are not leaf nodes, so empty {} */
       yield * system(opts, response.result, info.local ? {} : undefined)
     }
   }
@@ -99,7 +100,17 @@ const read = async function * (opts, target, start, end) {
   }
 }
 
+const get = async (opts, target, path) => {
+  let info = { method: 'get', args: { path } }
+  let last
+  for await (let line of system(opts, target, info)) {
+    last = line
+  }
+  return last.result
+}
+
 exports.Type = Type
 exports.Lookup = Lookup
 exports.system = system
 exports.read = read
+exports.get = get

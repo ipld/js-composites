@@ -2,7 +2,8 @@ const Block = require('@ipld/block')
 const assert = require('assert')
 const tsame = require('tsame')
 const MaxLengthList = require('../src/lists/max-length')
-const { system, Lookup } = require('../')
+const { system, Lookup, get } = require('../')
+const getPath = get
 
 const same = (...args) => assert.ok(tsame(...args))
 const test = it
@@ -20,14 +21,6 @@ const storage = () => {
     kv[_cid] = block
   }
   return { put, get }
-}
-
-const getResult = async iter => {
-  let last
-  for await (let part of iter) {
-    last = part
-  }
-  return last.result
 }
 
 const asyncList = async iter => {
@@ -64,13 +57,11 @@ test('basic gets', async () => {
     root = block
     await put(block)
   }
-  let iter = system({get, lookup}, root, {method: 'get', args: { path: '0' }})
-  let result = await getResult(iter)
+  let result = await getPath({get, lookup}, root, '0')
   let buffer = result.node
   same(buffer.toString(), 'hello world: 0')
 
-  iter = system({get, lookup}, root, {method: 'get', args: { path: '106' }})
-  result = await getResult(iter)
+  result = await getPath({get, lookup}, root, '106')
   buffer = result.node
   same(buffer.toString(), 'hello world: 106')
 })
