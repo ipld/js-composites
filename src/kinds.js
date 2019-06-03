@@ -1,7 +1,7 @@
 const CID = require('cids')
-const Type = require('./base')
+const Node = require('./base')
 
-class MapKind extends Type {
+class MapKind extends Node {
   get (args) {
     if (!args.path) throw new Error('Missing required argument "path"')
     let path = args.path.split('/').filter(x => x)
@@ -20,10 +20,7 @@ class MapKind extends Type {
 
 exports.MapKind = MapKind
 
-class LinkKind extends Type {
-  get kind () {
-    return 'link'
-  }
+class LinkKind extends Node {
   resolve (args) {
     return { result: this.node }
   }
@@ -31,10 +28,7 @@ class LinkKind extends Type {
 
 exports.LinkKind = LinkKind
 
-class StringKind extends Type {
-  get kind () {
-    return 'string'
-  }
+class StringKind extends Node {
   toString (args) {
     return this.node
   }
@@ -42,10 +36,7 @@ class StringKind extends Type {
 
 exports.StringKind = StringKind
 
-class BytesKind extends Type {
-  get kind () {
-    return 'bytes'
-  }
+class BytesKind extends Node {
   read (args) {
     let start = args.start || 0
     let end = args.end || this.node.length
@@ -55,3 +46,11 @@ class BytesKind extends Type {
 }
 
 exports.BytesKind = BytesKind
+
+class IntKind extends Node {
+  toInt (args) {
+    return this.node
+  }
+}
+
+exports.IntKind = IntKind

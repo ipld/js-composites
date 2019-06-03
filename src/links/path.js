@@ -1,4 +1,4 @@
-const Type = require('../base')
+const Node = require('../base')
 const Block = require('@ipld/block')
 
 const mkcall = (target, path) => {
@@ -7,12 +7,9 @@ const mkcall = (target, path) => {
 
 const _type = 'IPLD/Experimental/PathLink'
 
-class PathLink extends Type {
+class PathLink extends Node {
   get _type () {
     return _type
-  }
-  get kind () {
-    return 'link'
   }
   resolve (args) {
     return { call: mkcall(this.node.cid, this.node.path) }

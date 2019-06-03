@@ -1,15 +1,15 @@
 const withIs = require('class-is')
 
-class BaseType {
+class BaseNode {
   constructor (node, lookup) {
     this.node = node
     this.lookup = lookup
   }
 }
 
-const Type = withIs(BaseType, {
-  className: 'Type',
-  symbolName: '@ipld/types/Type'
+const Node = withIs(BaseNode, {
+  className: 'Node',
+  symbolName: '@ipld/engine'
 })
 
-module.exports = Type
+module.exports = Node 

@@ -1,4 +1,4 @@
-const Type = require('../base')
+const Node = require('../base')
 const Block = require('@ipld/block')
 
 const mkcall = (path, start, end) => {
@@ -8,7 +8,7 @@ const mkcall = (path, start, end) => {
 
 const _type = 'IPLD/Experimental/FixedChunker'
 
-class FixedChunker extends Type {
+class FixedChunker extends Node {
   constructor (node) {
     super(node)
     this.length = node.length
@@ -16,9 +16,6 @@ class FixedChunker extends Type {
   }
   get _type () {
     return _type
-  }
-  get kind () {
-    return 'bytes'
   }
   read (args) {
     let start = args.start || 0

@@ -69,7 +69,6 @@ test('multi-block traversal', async () => {
 test('single block bytes read', async () => {
   let block = Block.encoder({ hello: Buffer.from('world') }, 'dag-json')
   let result = await getResult(system({ lookup }, block, _getCall('hello')))
-  same(result.kind, 'bytes')
   let trace = await asyncList(read({ lookup }, result))
   same(trace.length, 1)
   same(trace[0].toString(), 'world')

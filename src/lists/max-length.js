@@ -1,14 +1,11 @@
-const Type = require('../base')
+const Node = require('../base')
 const Block = require('@ipld/block')
 
 const _type = 'IPLD/Experimental/MaxLengthList'
 
-class MaxLengthList extends Type {
+class MaxLengthList extends Node {
   get _type () {
     return _type
-  }
-  get kind () {
-    return 'list'
   }
   get (args) {
     let path = args.path.split('/').filter(x => x)

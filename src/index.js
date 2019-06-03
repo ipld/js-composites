@@ -1,4 +1,4 @@
-const Type = require('./base')
+const Node = require('./base')
 const Lookup = require('./lookup')
 const CID = require('cids')
 const Block = require('@ipld/block')
@@ -17,7 +17,7 @@ const system = async function * (opts, target, info) {
     target = target.decode()
     yield { trace: 'decode', block, result: target, leaf: !info }
   }
-  if (!Type.isType(target)) {
+  if (!Node.isNode(target)) {
     let value = target
     target = opts.lookup.fromKind(target)
     yield { trace: 'type', node: value, result: target, leaf: !info }
@@ -38,10 +38,10 @@ const system = async function * (opts, target, info) {
   /* type method calls */
   if (info.method) {
     if (!target[info.method]) {
-      throw new Error(`Type does not implement "${info.method}"`)
+      throw new Error(`Node does not implement "${info.method}"`)
     }
     let response = await target[info.method](info.args, info.continuation)
-    if (!response) throw new Error('Type did not return response')
+    if (!response) throw new Error('Node did not return response')
     yield { response, target, call: info, result: response.result }
 
     /* type method calls from types */
@@ -96,6 +96,7 @@ const system = async function * (opts, target, info) {
 const read = async function * (opts, target, start, end) {
   let info = { method: 'read', args: { start, end } }
   for await (let line of system(opts, target, info)) {
+    if (opts.onTrace) opts.onTrace(line)
     if (line.trace === 'type' && line.leaf && Buffer.isBuffer(line.node)) yield line.node
   }
 }
@@ -104,12 +105,13 @@ const get = async (opts, target, path) => {
   let info = { method: 'get', args: { path } }
   let last
   for await (let line of system(opts, target, info)) {
+    if (opts.onTrace) opts.onTrace(line)
     last = line
   }
   return last.result
 }
 
-exports.Type = Type
+exports.Node = Node
 exports.Lookup = Lookup
 exports.system = system
 exports.read = read
