@@ -73,3 +73,9 @@ test('single block bytes read', async () => {
   same(trace.length, 1)
   same(trace[0].toString(), 'world')
 })
+
+test('single block int', async () => {
+  let block = Block.encoder({ hello: 31337 }, 'dag-json')
+  let result = await getResult(system({ lookup }, block, _getCall('hello')))
+  same(result.toInt(), 31337)
+})

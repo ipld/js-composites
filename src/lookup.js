@@ -21,6 +21,7 @@ class Lookup {
     if (Buffer.isBuffer(source)) return new kinds.BytesKind(source)
     if (source && typeof source === 'object') return new kinds.MapKind(source)
     if (typeof source === 'string') return new kinds.StringKind(source)
+    if (typeof source === 'number' && Number.isInteger(source)) return new kinds.IntKind(source)
     throw new Error('NOT IMPLEMENTED!')
   }
 }
