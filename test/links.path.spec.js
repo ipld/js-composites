@@ -25,7 +25,7 @@ const storage = () => {
 }
 
 const lookup = new Lookup()
-lookup.register(PathLink._type, PathLink)
+lookup.register(PathLink)
 
 test('basic resolve', async () => {
   let { get, put } = storage()

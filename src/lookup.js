@@ -8,6 +8,10 @@ class Lookup {
     this._types = {}
   }
   register (name, typeClass) {
+    if (!typeClass) {
+      typeClass = name
+      name = name._type
+    }
     this._types[name] = typeClass
   }
   fromNode (data) {
