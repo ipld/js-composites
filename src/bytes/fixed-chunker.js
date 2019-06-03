@@ -9,23 +9,18 @@ const mkcall = (path, start, end) => {
 const _type = 'IPLD/Experimental/FixedChunker'
 
 class FixedChunker extends Node {
-  constructor (node) {
-    super(node)
-    this.length = node.length
-    this.chunkSize = node.chunkSize
-  }
   get _type () {
     return _type
   }
   read (args) {
     let start = args.start || 0
-    let end = args.end || this.length
-    let firstIndex = Math.floor(start / this.chunkSize)
-    let lastIndex = Math.floor(end / this.chunkSize)
-    let firstStart = start - (firstIndex * this.chunkSize)
+    let end = args.end || this.data.length
+    let firstIndex = Math.floor(start / this.data.chunkSize)
+    let lastIndex = Math.floor(end / this.data.chunkSize)
+    let firstStart = start - (firstIndex * this.data.chunkSize)
     let reads = []
     if (firstIndex === lastIndex) {
-      let firstEnd = end - (firstIndex * this.chunkSize)
+      let firstEnd = end - (firstIndex * this.data.chunkSize)
       return { call: mkcall(firstIndex, firstStart, firstEnd) }
     } else {
       reads.push(mkcall(firstIndex, firstStart))
@@ -35,7 +30,7 @@ class FixedChunker extends Node {
       reads.push(mkcall(i))
       i++
     }
-    reads.push(mkcall(i, 0, end - (i * this.chunkSize)))
+    reads.push(mkcall(i, 0, end - (i * this.data.chunkSize)))
     return { calls: reads }
   }
 }

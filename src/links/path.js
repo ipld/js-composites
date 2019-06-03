@@ -12,7 +12,7 @@ class PathLink extends Node {
     return _type
   }
   resolve (args) {
-    return { call: mkcall(this.node.cid, this.node.path) }
+    return { call: mkcall(this.data.cid, this.data.path) }
   }
 }
 PathLink.create = (cid, path, codec = 'dag-json') => {

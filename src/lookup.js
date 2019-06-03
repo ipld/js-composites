@@ -10,12 +10,12 @@ class Lookup {
   register (name, typeClass) {
     this._types[name] = typeClass
   }
-  fromNode (node) {
-    let _Class = this._types[node._type]
-    if (!_Class) throw new Error(`No type registered named "${node._type}"`)
-    return new _Class(node, this)
+  fromNode (data) {
+    let _Class = this._types[data._type]
+    if (!_Class) throw new Error(`No type registered named "${data._type}"`)
+    return new _Class(data, this)
   }
-  fromKind (source) {
+  from (source) {
     if (source._type) return this.fromNode(source)
     if (CID.isCID(source)) return new kinds.LinkKind(source)
     if (Buffer.isBuffer(source)) return new kinds.BytesKind(source)

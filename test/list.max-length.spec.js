@@ -58,10 +58,10 @@ test('basic gets', async () => {
     await put(block)
   }
   let result = await getPath({ get, lookup }, root, '0')
-  let buffer = result.node
+  let buffer = result.data
   same(buffer.toString(), 'hello world: 0')
 
   result = await getPath({ get, lookup }, root, '106')
-  buffer = result.node
+  buffer = result.data
   same(buffer.toString(), 'hello world: 106')
 })

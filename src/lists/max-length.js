@@ -12,14 +12,14 @@ class MaxLengthList extends Node {
     let attr = parseInt(path.shift())
     if (isNaN(attr)) throw new Error('List type can only lookup integers')
 
-    if (this.node.leaf) {
-      return { result: this.node.data[attr] }
+    if (this.data.leaf) {
+      return { result: this.data.data[attr] }
     }
 
     let i = 0
     let seen = 0
-    while (i < this.node.length) {
-      let m = this.node.lengthMap[i]
+    while (i < this.data.length) {
+      let m = this.data.lengthMap[i]
       if (attr < (seen + m)) {
         path = (attr - seen) + path.join('/')
         return { call: { target: 'data/' + i, info: { method: 'get', args: { path } }, proxy: true } }

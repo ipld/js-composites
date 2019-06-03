@@ -1,8 +1,8 @@
 const withIs = require('class-is')
 
 class BaseNode {
-  constructor (node, lookup) {
-    this.node = node
+  constructor (data, lookup) {
+    this.data = data
     this.lookup = lookup
   }
 }

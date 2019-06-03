@@ -36,5 +36,5 @@ test('basic resolve', async () => {
   let root = Block.encoder({ one: await link.cid() }, 'dag-json')
   await put(root)
   let result = await getPath({ get, lookup }, root, 'one')
-  same(result.node, 'hello world')
+  same(result.data, 'hello world')
 })

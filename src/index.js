@@ -19,8 +19,8 @@ const system = async function * (opts, target, info) {
   }
   if (!Node.isNode(target)) {
     let value = target
-    target = opts.lookup.fromKind(target)
-    yield { trace: 'type', node: value, result: target, leaf: !info }
+    target = opts.lookup.from(target)
+    yield { trace: 'type', data: value, result: target, leaf: !info }
   }
 
   if (!info) info = {}
@@ -57,7 +57,7 @@ const system = async function * (opts, target, info) {
       if (typeof call.target === 'string') {
         let last
         let _getcall = { method: 'get', args: { path: call.target }, local: true }
-        for await (let trace of system(opts, new MapKind(origin.node), _getcall)) {
+        for await (let trace of system(opts, new MapKind(origin.data), _getcall)) {
           last = trace
           yield trace
         }
@@ -97,7 +97,7 @@ const read = async function * (opts, target, start, end) {
   let info = { method: 'read', args: { start, end } }
   for await (let line of system(opts, target, info)) {
     if (opts.onTrace) opts.onTrace(line)
-    if (line.trace === 'type' && line.leaf && Buffer.isBuffer(line.node)) yield line.node
+    if (line.trace === 'type' && line.leaf && Buffer.isBuffer(line.data)) yield line.data
   }
 }
 
