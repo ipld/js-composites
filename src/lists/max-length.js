@@ -1,7 +1,7 @@
 const Node = require('../base')
 const Block = require('@ipld/block')
 
-const _type = 'IPLD/Experimental/MaxLengthList'
+const _type = 'IPLD/Experimental/MaxLengthList/0'
 
 class MaxLengthList extends Node {
   get _type () {

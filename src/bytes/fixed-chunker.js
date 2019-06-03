@@ -6,7 +6,7 @@ const mkcall = (path, start, end) => {
   return { info: { method: 'read', args: { start, end } }, target, proxy: true }
 }
 
-const _type = 'IPLD/Experimental/FixedChunker'
+const _type = 'IPLD/Experimental/FixedChunker/0'
 
 class FixedChunker extends Node {
   get _type () {

@@ -5,7 +5,7 @@ const mkcall = (target, path) => {
   return { info: { method: 'get', args: { path } }, target, proxy: true }
 }
 
-const _type = 'IPLD/Experimental/PathLink'
+const _type = 'IPLD/Experimental/PathLink/0'
 
 class PathLink extends Node {
   get _type () {
