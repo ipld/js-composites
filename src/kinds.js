@@ -51,6 +51,9 @@ class IntKind extends Node {
   toInt (args) {
     return this.data
   }
+  toNumber (args) {
+    return this.data
+  }
 }
 
 exports.IntKind = IntKind
