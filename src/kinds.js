@@ -16,6 +16,9 @@ class MapKind extends Node {
     }
     return { result: value }
   }
+  keys () {
+    return { result: Object.keys(this.data) }
+  }
 }
 
 exports.MapKind = MapKind

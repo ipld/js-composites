@@ -111,8 +111,20 @@ const get = async (opts, target, path) => {
   return last.result
 }
 
+const keys = async function * (opts, target) {
+  let info = { method: 'keys', args: { } }
+  for await (let line of system(opts, target, info)) {
+    if (line.result && line.leaf) {
+      for (let key of line.result.data) {
+        yield key
+      }
+    }
+  }
+}
+
 exports.Node = Node
 exports.Lookup = Lookup
 exports.system = system
 exports.read = read
 exports.get = get
+exports.keys = keys
