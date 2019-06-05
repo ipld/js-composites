@@ -72,6 +72,7 @@ const system = async function * (opts, target, info) {
       } else {
         info.continuation = call.info.continuation || {}
         delete call.info.continuation
+        call.info.local = true
         let last
         for await (let trace of system(opts, call.target, call.info)) {
           last = trace
