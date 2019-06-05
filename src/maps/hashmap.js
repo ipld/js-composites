@@ -65,6 +65,35 @@ class HashMap extends Type {
 
     return { call }
   }
+
+  async keys (args, continuation) {
+    let traversal
+    if (!continuation) { // initial call, set up a traversal
+      // check block format (this will be a job for schemas eventually)
+      if (!iamap.isRootSerializable(this.data) || !iamap.isSerializable(this.data)) {
+        throw new Error('Block does not contain expected HashMap root data')
+      }
+      traversal = iamap.traverseEntries(this.data)
+      continuation = { traversal }
+    } else { // subsequent call, feed the next block to the traversal
+      let childBlock = continuation.response.data
+      // check block format (this will be a job for schemas eventually)
+      if (!iamap.isSerializable(childBlock)) {
+        throw new Error('Block does not contain expected HashMap child node data')
+      }
+      traversal = continuation.traversal
+      traversal.next(childBlock)
+    }
+
+    let result = [...traversal.keys()].map((k) => k.toString()) // keys for this node, if any
+    let target = traversal.traverse() // process current block traversal
+    let call
+    if (target) {
+      let info = { continuation, method: 'get', args: { path: '/' }, local: true }
+      call = { info, target }
+    }
+    return { call, result }
+  }
 }
 
 HashMap._type = _type

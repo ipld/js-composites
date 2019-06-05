@@ -3,7 +3,7 @@ const assert = require('assert')
 const tsame = require('tsame')
 const Block = require('@ipld/block')
 const HashMap = require('../src/maps/hashmap')
-const { Lookup, get } = require('../')
+const { Lookup, get, keys } = require('../')
 
 const same = (...args) => assert.ok(tsame(...args))
 const test = it
@@ -86,4 +86,29 @@ test('HashMap multi-block set/get', async () => {
     let result = await get(store, root, `key${i}`)
     same(result.toString(), `value${i}`)
   }
+})
+
+async function asyncList (iter) {
+  let parts = []
+  for await (let part of iter) {
+    parts.push(part)
+  }
+  return parts
+}
+
+test('HashMap multi-block keys', async () => {
+  let store = storage()
+  let expectedKeys = []
+  let map = await HashMap.create(store, 'dag-json', { bitWidth: 4, bucketSize: 2 })
+  for (let i = 0; i < 100; i++) {
+    let key = `key${i}`
+    map = await map.set(key, `value${i}`)
+    expectedKeys.push(key)
+  }
+  let root = map.id
+
+  let _keys = await asyncList(keys(store, root))
+  _keys.sort()
+  expectedKeys.sort()
+  same(_keys, expectedKeys)
 })
