@@ -1,10 +1,8 @@
 /* globals it */
-const assert = require('assert')
-const tsame = require('tsame')
+const { assert } = require('referee')
 const FixedChunker = require('../src/bytes/fixed-chunker')
 const { Lookup, read } = require('../')
 
-const same = (...args) => assert.ok(tsame(...args))
 const test = it
 
 const storage = () => {
@@ -36,18 +34,18 @@ lookup.register(FixedChunker._type, FixedChunker)
 test('basic create', async () => {
   let iter = FixedChunker.create(Buffer.from('0123456789'), 3)
   let parts = await asyncList(iter)
-  same(parts.length, 5)
-  same(parts[0].codec, 'raw')
-  same(parts[4].codec, 'dag-json')
-  same(parts[0].decode().toString(), '012')
-  same(parts[1].decode().toString(), '345')
-  same(parts[2].decode().toString(), '678')
-  same(parts[3].decode().toString(), '9')
+  assert.same(parts.length, 5)
+  assert.same(parts[0].codec, 'raw')
+  assert.same(parts[4].codec, 'dag-json')
+  assert.same(parts[0].decode().toString(), '012')
+  assert.same(parts[1].decode().toString(), '345')
+  assert.same(parts[2].decode().toString(), '678')
+  assert.same(parts[3].decode().toString(), '9')
   let root = parts[4].decode()
-  same(root.chunkSize, 3)
-  same(root.length, 10)
-  same(root.data.length, 4)
-  same(root._type, FixedChunker._type)
+  assert.same(root.chunkSize, 3)
+  assert.same(root.length, 10)
+  assert.same(root.data.length, 4)
+  assert.same(root._type, FixedChunker._type)
 })
 
 test('basic read', async () => {
@@ -60,9 +58,9 @@ test('basic read', async () => {
   }
   let reader = read({ get, lookup }, root)
   let parts = await asyncList(reader)
-  same(parts.length, 4)
-  same(parts[0].toString(), '012')
-  same(parts[1].toString(), '345')
-  same(parts[2].toString(), '678')
-  same(parts[3].toString(), '9')
+  assert.same(parts.length, 4)
+  assert.same(parts[0].toString(), '012')
+  assert.same(parts[1].toString(), '345')
+  assert.same(parts[2].toString(), '678')
+  assert.same(parts[3].toString(), '9')
 })

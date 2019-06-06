@@ -1,12 +1,10 @@
 /* globals it */
 const Block = require('@ipld/block')
-const assert = require('assert')
-const tsame = require('tsame')
+const { assert } = require('referee')
 const MaxLengthList = require('../src/lists/max-length')
 const { Lookup, get } = require('../')
 const getPath = get
 
-const same = (...args) => assert.ok(tsame(...args))
 const test = it
 
 const storage = () => {
@@ -43,7 +41,7 @@ test('basic create', async () => {
   let iter = MaxLengthList.create(cids, 3)
   let trace = await asyncList(iter)
   for (let block of trace) {
-    assert.ok(block.decode().data.length < 4)
+    assert(block.decode().data.length < 4)
   }
 })
 
@@ -59,9 +57,9 @@ test('basic gets', async () => {
   }
   let result = await getPath({ get, lookup }, root, '0')
   let buffer = result.data
-  same(buffer.toString(), 'hello world: 0')
+  assert.same(buffer.toString(), 'hello world: 0')
 
   result = await getPath({ get, lookup }, root, '106')
   buffer = result.data
-  same(buffer.toString(), 'hello world: 106')
+  assert.same(buffer.toString(), 'hello world: 106')
 })

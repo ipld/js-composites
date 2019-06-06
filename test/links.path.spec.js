@@ -1,12 +1,10 @@
 /* globals it */
 const Block = require('@ipld/block')
-const assert = require('assert')
-const tsame = require('tsame')
+const { assert } = require('referee')
 const PathLink = require('../src/links/path')
 const { Lookup, get } = require('../')
 const getPath = get
 
-const same = (...args) => assert.ok(tsame(...args))
 const test = it
 
 const storage = () => {
@@ -36,5 +34,5 @@ test('basic resolve', async () => {
   let root = Block.encoder({ one: await link.cid() }, 'dag-json')
   await put(root)
   let result = await getPath({ get, lookup }, root, 'one')
-  same(result.data, 'hello world')
+  assert.same(result.data, 'hello world')
 })

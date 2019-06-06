@@ -1,10 +1,8 @@
 /* globals it */
 const Block = require('@ipld/block')
-const assert = require('assert')
-const tsame = require('tsame')
+const { assert } = require('referee')
 const { system, Lookup, read, keys } = require('../')
 
-const same = (...args) => assert.ok(tsame(...args))
 const test = it
 
 const storage = () => {
@@ -46,12 +44,12 @@ test('single block traversal', async () => {
   let block = Block.encoder({ hello: 'world' }, 'dag-json')
   let result = await getResult(system({ lookup }, block, _getCall('hello')))
   let str = result.toString()
-  same(str, 'world')
+  assert.same(str, 'world')
 
   block = Block.encoder({ one: { two: 'world' } }, 'dag-json')
   result = await getResult(system({ lookup }, block, _getCall('one/two')))
   str = result.toString()
-  same(str, 'world')
+  assert.same(str, 'world')
 })
 
 test('multi-block traversal', async () => {
@@ -63,26 +61,26 @@ test('multi-block traversal', async () => {
   let iter = system({ lookup, get }, root, _getCall('one/two/hello'))
   let result = await getResult(iter)
   let str = result.toString()
-  same(str, 'world')
+  assert.same(str, 'world')
 })
 
 test('single block bytes read', async () => {
   let block = Block.encoder({ hello: Buffer.from('world') }, 'dag-json')
   let result = await getResult(system({ lookup }, block, _getCall('hello')))
   let trace = await asyncList(read({ lookup }, result))
-  same(trace.length, 1)
-  same(trace[0].toString(), 'world')
+  assert.same(trace.length, 1)
+  assert.same(trace[0].toString(), 'world')
 })
 
 test('single block int', async () => {
   let block = Block.encoder({ hello: 31337 }, 'dag-json')
   let result = await getResult(system({ lookup }, block, _getCall('hello')))
-  same(result.toInt(), 31337)
-  same(result.toNumber(), 31337)
+  assert.same(result.toInt(), 31337)
+  assert.same(result.toNumber(), 31337)
 })
 
 test('keys from single block', async () => {
   let block = Block.encoder({ hello: 1, world: 2}, 'dag-json')
   let _keys = await asyncList(keys({ lookup }, block))
-  same(_keys, ['hello', 'world'])
+  assert.equals(_keys, ['hello', 'world'])
 })
