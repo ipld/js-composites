@@ -89,7 +89,7 @@ class HashMap extends Type {
     let target = traversal.traverse() // process current block traversal
     let call
     if (target) {
-      let info = { continuation, method: 'get', args: { path: '/' }, local: true }
+      let info = { continuation, method: 'get', args: { path: '/' } }
       call = { info, target }
     }
     return { call, result }
