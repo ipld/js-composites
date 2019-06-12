@@ -1,5 +1,5 @@
 {
-  "name": "@ipld/types",
+  "name": "@ipld/generics",
   "version": "0.0.0",
   "main": "src/index.js",
   "scripts": {
