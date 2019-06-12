@@ -46,6 +46,9 @@ class BytesKind extends Node {
     if (start === 0 && end === this.data.length) return { result: this.data }
     else return { result: this.data.slice(start, end) }
   }
+  length () {
+    return { result: this.data.length }
+  }
 }
 
 exports.BytesKind = BytesKind

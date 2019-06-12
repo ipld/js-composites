@@ -102,14 +102,25 @@ const read = async function * (opts, target, start, end) {
   }
 }
 
-const get = async (opts, target, path) => {
-  let info = { method: 'get', args: { path } }
+const _last = async (opts, target, info) => {
   let last
   for await (let line of system(opts, target, info)) {
     if (opts.onTrace) opts.onTrace(line)
     last = line
   }
+  return last
+}
+
+const get = async (opts, target, path) => {
+  let info = { method: 'get', args: { path } }
+  let last = await _last(opts, target, info)
   return last.result
+}
+
+const length = async (opts, target) => {
+  let info = { method: 'length', args: {} }
+  let last = await _last(opts, target, info)
+  return last.result.data
 }
 
 const keys = async function * (opts, target) {
@@ -129,3 +140,4 @@ exports.system = system
 exports.read = read
 exports.get = get
 exports.keys = keys
+exports.length = length

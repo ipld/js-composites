@@ -12,4 +12,4 @@ const Node = withIs(BaseNode, {
   symbolName: '@ipld/engine'
 })
 
-module.exports = Node 
+module.exports = Node

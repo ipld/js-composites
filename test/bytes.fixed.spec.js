@@ -2,7 +2,7 @@
 const assert = require('assert')
 const tsame = require('tsame')
 const FixedChunker = require('../src/bytes/fixed-chunker')
-const { Lookup, read } = require('../')
+const { Lookup, read, length } = require('../')
 
 const same = (...args) => assert.ok(tsame(...args))
 const test = it
@@ -65,4 +65,16 @@ test('basic read', async () => {
   same(parts[1].toString(), '345')
   same(parts[2].toString(), '678')
   same(parts[3].toString(), '9')
+})
+
+test('basic read', async () => {
+  let { get, put } = storage()
+  let iter = FixedChunker.create(Buffer.from('0123456789'), 3)
+  let root
+  for await (let block of iter) {
+    await put(block)
+    root = block
+  }
+  let _length = await length({ get, lookup }, root)
+  same(_length, 10)
 })

@@ -2,7 +2,7 @@
 const Block = require('@ipld/block')
 const assert = require('assert')
 const tsame = require('tsame')
-const { system, Lookup, read, keys } = require('../')
+const { system, Lookup, read, keys, length, get } = require('../')
 
 const same = (...args) => assert.ok(tsame(...args))
 const test = it
@@ -82,7 +82,14 @@ test('single block int', async () => {
 })
 
 test('keys from single block', async () => {
-  let block = Block.encoder({ hello: 1, world: 2}, 'dag-json')
+  let block = Block.encoder({ hello: 1, world: 2 }, 'dag-json')
   let _keys = await asyncList(keys({ lookup }, block))
   same(_keys, ['hello', 'world'])
+})
+
+test('byte length', async () => {
+  let block = Block.encoder({ hello: Buffer.from('world') }, 'dag-json')
+  let target = await get({ lookup }, block, 'hello')
+  let _length = await length({ lookup }, target)
+  same(_length, 5)
 })

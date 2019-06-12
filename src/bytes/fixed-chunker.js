@@ -33,6 +33,9 @@ class FixedChunker extends Node {
     reads.push(mkcall(i, 0, end - (i * this.data.chunkSize)))
     return { calls: reads }
   }
+  length (args) {
+    return { result: this.data.length }
+  }
 }
 FixedChunker.create = async function * (source, chunkSize = 1024, codec = 'dag-json', createList = null) {
   let length
