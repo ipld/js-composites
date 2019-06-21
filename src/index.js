@@ -54,9 +54,9 @@ const system = async function * (opts, target, info) {
       let origin = target
 
       /* resolve local path lookup for target */
-      if (typeof call.target === 'string') {
+      if (call.path) {
         let last
-        let _getcall = { method: 'get', args: { path: call.target }, local: true }
+        let _getcall = { method: 'get', args: { path: call.path }, local: true }
         for await (let trace of system(opts, new MapKind(origin.data), _getcall)) {
           last = trace
           yield trace

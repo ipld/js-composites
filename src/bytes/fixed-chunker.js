@@ -3,7 +3,7 @@ const Block = require('@ipld/block')
 
 const mkcall = (path, start, end) => {
   let target = 'data/' + path
-  return { info: { method: 'read', args: { start, end } }, target, proxy: true }
+  return { info: { method: 'read', args: { start, end } }, path: target, proxy: true }
 }
 
 const _type = 'IPLD/Experimental/FixedChunker/0'
@@ -35,6 +35,48 @@ class FixedChunker extends Node {
   }
   length (args) {
     return { result: this.data.length }
+  }
+  create (args, continuation) {
+    let source = args.source
+    let length = source.length
+    let chunkSize = args.chunkSize || 1024
+    let inlineListMax = args.inlineListMax || 100
+    if (this.data) {
+      if (this.data.chunkSize) chunkSize = this.data.chunkSize
+      if (this.data.inlineListMax) inlineListMax = this.data.inlineListMax   
+    }
+    if (!continuation) {
+      continuation = { i: 0, cids: [] }
+    }
+    if (continuation.state === 'chunk') {
+      continuation.i += chunkSize
+      continuation.cids.push(continuation.make.cid)
+    }
+    if (continuation.state === 'list') {
+      let data = continuation.make.cid
+      continuation.state = 'final'
+      return { continuation, make: { source: { _type, length, chunkSize, data } } }   
+    }
+    if (continuation.state === 'final') {
+      return { result: continuation.make.cid }
+    }
+    let i = continuation.i
+    let cids = continuation.cids
+    
+    if (i < source.length) {
+      continuation.state = 'chunk' 
+      return { continuation, make: { raw: source.slice(i, i + chunkSize) } }
+    }
+    if (cids.length > inlineListMax) {
+      continuation.state = 'list'
+      let call = {
+        target: this.bigList,
+        info: { method: 'create', args: { source: cids } }
+      }
+      return { continuation, call }
+    }
+    continuation.state = 'final'
+    return { continuation, make: { source: { _type, length, chunkSize, data: cids } } } 
   }
 }
 FixedChunker.create = async function * (source, chunkSize = 1024, codec = 'dag-json', createList = null) {

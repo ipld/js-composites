@@ -22,7 +22,7 @@ class MaxLengthList extends Node {
       let m = this.data.lengthMap[i]
       if (attr < (seen + m)) {
         path = (attr - seen) + path.join('/')
-        return { call: { target: 'data/' + i, info: { method: 'get', args: { path } }, proxy: true } }
+        return { call: { path: 'data/' + i, info: { method: 'get', args: { path } }, proxy: true } }
       }
       i++
       seen += m
