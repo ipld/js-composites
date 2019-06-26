@@ -4,6 +4,8 @@ const CID = require('cids')
 const Block = require('@ipld/block')
 const { MapKind } = require('./kinds')
 
+const defaultCodec = 'dag-json'
+
 const system = async function * (opts, target, info) {
   /* target resolution */
   let block
@@ -43,6 +45,26 @@ const system = async function * (opts, target, info) {
     let response = await target[info.method](info.args, info.continuation)
     if (!response) throw new Error('Node did not return response')
     yield { response, target, call: info, result: response.result }
+
+    if (response.make) {
+      let _make = response.make
+      let block
+      if (_make.raw) block = Block.encoder(_make.raw, 'raw')
+      else if (_make.source) {
+        block = Block.encoder(_make.source, opts.codec || defaultCodec)
+      } else {
+        throw new Error("Make must provide source or raw")
+      } 
+      // TODO: envelopes for encryption
+      yield { trace: make, block, origin: _make}
+      let cid = await block.cid()
+      info.continuation = _make.info.continuation || {}
+      info.continuation.cid = cid
+      yield * system(opts, target, info)
+      if (_make.proxy) {
+        response.result = { cid }
+      }
+    }
 
     /* type method calls from types */
     let calls

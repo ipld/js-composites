@@ -58,7 +58,7 @@ class FixedChunker extends Node {
       return { continuation, make: { source: { _type, length, chunkSize, data } } }   
     }
     if (continuation.state === 'final') {
-      return { result: continuation.make.cid }
+      return { result: { cid: continuation.make.cid } }
     }
     let i = continuation.i
     let cids = continuation.cids
