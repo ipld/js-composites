@@ -4,7 +4,11 @@ const CID = require('cids')
 const Block = require('@ipld/block')
 const { MapKind } = require('./kinds')
 
+const defaultCodec = 'dag-json'
+
 const system = async function * (opts, target, info) {
+  if (!opts._seen) opts._seen = new Map()
+  if (!opts.makeDuplicateLimit) opts.makeDuplicateLimit = 5
   /* target resolution */
   let block
   if (CID.isCID(target)) {
@@ -44,6 +48,31 @@ const system = async function * (opts, target, info) {
     if (!response) throw new Error('Node did not return response')
     yield { response, target, call: info, result: response.result }
 
+    if (response.make) {
+      let _make = response.make
+      let block
+      if (_make.raw) block = Block.encoder(_make.raw, 'raw')
+      else if (_make.source) {
+        block = Block.encoder(_make.source, opts.codec || defaultCodec)
+      } else {
+        throw new Error('Make must provide source or raw')
+      }
+      // TODO: envelopes for encryption
+      yield { trace: 'make', block, origin: _make }
+      if (opts.put) await opts.put(block)
+      let cid = await block.cid()
+      let _cid = cid.toString()
+      if (opts._seen.has(_cid)) opts._seen.set(_cid, opts._seen.get(_cid) + 1)
+      else opts._seen.set(_cid, 0)
+      if (opts._seen.get(_cid) > opts.makeDuplicateLimit) throw new Error('Exceeded duplicate block creation limit')
+      info.continuation = response.continuation || {}
+      info.continuation.cid = cid
+      yield * system(opts, target, info)
+      if (_make.proxy) {
+        response.result = { cid }
+      }
+    }
+
     /* type method calls from types */
     let calls
     if (response.call) calls = [ response.call ]
@@ -54,9 +83,9 @@ const system = async function * (opts, target, info) {
       let origin = target
 
       /* resolve local path lookup for target */
-      if (typeof call.target === 'string') {
+      if (call.path) {
         let last
-        let _getcall = { method: 'get', args: { path: call.target }, local: true }
+        let _getcall = { method: 'get', args: { path: call.path }, local: true }
         for await (let trace of system(opts, new MapKind(origin.data), _getcall)) {
           last = trace
           yield trace
@@ -134,6 +163,20 @@ const keys = async function * (opts, target) {
   }
 }
 
+const create = async (opts, target, args = {}) => {
+  let info = { method: 'create', args }
+  if (typeof target === 'string') {
+    target = opts.lookup.fromNode({ _type: target })
+  }
+  let block
+  for await (let line of system(opts, target, info)) {
+    if (line.trace === 'make') {
+      block = line.block
+    }
+  }
+  return block
+}
+
 exports.Node = Node
 exports.Lookup = Lookup
 exports.system = system
@@ -141,3 +184,4 @@ exports.read = read
 exports.get = get
 exports.keys = keys
 exports.length = length
+exports.create = create
