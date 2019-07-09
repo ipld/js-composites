@@ -32,8 +32,9 @@ class MaxLengthList extends Node {
     let values = args.values
     let len = values.length
     let maxLength = args.maxLength
+    if (!values || !maxLength) throw new Error('Missing required arguments {values, maxLength}')
     continuation = Object.assign({}, continuation)
-    continuation.values = values.slice()
+    continuation.values = values
     continuation.parts = continuation.parts || []
     let size = Math.ceil(len / maxLength)
 
@@ -43,8 +44,8 @@ class MaxLengthList extends Node {
 
     if (continuation.state === 'subcreate') {
       continuation.parts.push({
-        cid: continuation.result.cid,
-        len: continuation.result.len
+        cid: continuation.response.data.cid,
+        len: continuation.response.data.len
       })
     }
     if (continuation.state === 'make') {
@@ -58,13 +59,15 @@ class MaxLengthList extends Node {
       let _continuation = { state: 'subcreate' }
       return { call: {
         target: this.data,
-        method: 'create',
-        args: _args,
-        continuation: _continuation
+        info: {
+          method: 'create',
+          args: _args,
+          continuation: _continuation
+        }
       } }
     } else {
       if (continuation.values.length) {
-        let data = continuation.values.splice(0, size)
+        let data = continuation.values.splice(0, maxLength)
         let source = { _type, data, length: data.length, leaf: true }
         continuation.state = 'make'
         continuation.len = data.length
@@ -74,7 +77,7 @@ class MaxLengthList extends Node {
         let lengthMap = continuation.parts.map(o => o.len)
         let data = continuation.parts.map(o => o.cid)
         continuation.state = 'finish'
-        continuation.len = len
+        continuation.len = lengthMap.reduce((x, y) => x + y, 0)
         return {
           make: {
             source: { _type, data, lengthMap, length: len, maxLength }

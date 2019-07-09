@@ -3,7 +3,7 @@ const Block = require('@ipld/block')
 const assert = require('assert')
 const tsame = require('tsame')
 const MaxLengthList = require('../src/lists/max-length')
-const { Lookup, get } = require('../')
+const { Lookup, get, create } = require('../')
 const getPath = get
 
 const same = (...args) => assert.ok(tsame(...args))
@@ -38,13 +38,11 @@ lookup.register(MaxLengthList._type, MaxLengthList)
 let fixture = Array.from({ length: 107 }).map((v, k) => Buffer.from('hello world: ' + k))
 
 test('basic create', async () => {
+  let { get, put } = storage()
+  let opts = { lookup, get, put }
   let blocks = fixture.map(b => Block.encoder(b, 'raw'))
-  let cids = await Promise.all(blocks.map(b => b.cid()))
-  let iter = MaxLengthList.create(cids, 3)
-  let trace = await asyncList(iter)
-  for (let block of trace) {
-    assert.ok(block.decode().data.length < 4)
-  }
+  let values = await Promise.all(blocks.map(b => b.cid()))
+  let root = await create(opts, MaxLengthList._type, { values, maxLength: 3 })
 })
 
 test('basic gets', async () => {
