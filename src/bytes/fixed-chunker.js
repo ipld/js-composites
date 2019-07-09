@@ -43,7 +43,7 @@ class FixedChunker extends Node {
     let inlineListMax = args.inlineListMax || 100
     if (this.data) {
       if (this.data.chunkSize) chunkSize = this.data.chunkSize
-      if (this.data.inlineListMax) inlineListMax = this.data.inlineListMax   
+      if (this.data.inlineListMax) inlineListMax = this.data.inlineListMax
     }
     if (!continuation) {
       continuation = { i: 0, cids: [] }
@@ -55,16 +55,16 @@ class FixedChunker extends Node {
     if (continuation.state === 'list') {
       let data = continuation.make.cid
       continuation.state = 'final'
-      return { continuation, make: { source: { _type, length, chunkSize, data } } }   
+      return { continuation, make: { source: { _type, length, chunkSize, data } } }
     }
     if (continuation.state === 'final') {
       return { result: { cid: continuation.make.cid } }
     }
     let i = continuation.i
     let cids = continuation.cids
-    
+
     if (i < source.length) {
-      continuation.state = 'chunk' 
+      continuation.state = 'chunk'
       return { continuation, make: { raw: source.slice(i, i + chunkSize) } }
     }
     if (cids.length > inlineListMax) {
@@ -76,7 +76,7 @@ class FixedChunker extends Node {
       return { continuation, call }
     }
     continuation.state = 'final'
-    return { continuation, make: { source: { _type, length, chunkSize, data: cids } } } 
+    return { continuation, make: { source: { _type, length, chunkSize, data: cids } } }
   }
 }
 FixedChunker.create = async function * (source, chunkSize = 1024, codec = 'dag-json', createList = null) {

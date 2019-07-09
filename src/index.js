@@ -53,10 +53,10 @@ const system = async function * (opts, target, info) {
       else if (_make.source) {
         block = Block.encoder(_make.source, opts.codec || defaultCodec)
       } else {
-        throw new Error("Make must provide source or raw")
-      } 
+        throw new Error('Make must provide source or raw')
+      }
       // TODO: envelopes for encryption
-      yield { trace: make, block, origin: _make}
+      yield { trace: 'make', block, origin: _make }
       let cid = await block.cid()
       info.continuation = _make.info.continuation || {}
       info.continuation.cid = cid
