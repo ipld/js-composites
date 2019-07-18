@@ -14,7 +14,7 @@ class Vector extends Node {
     let index = parseInt(path.shift(), 10)
 
     if (!Number.isInteger(index)) {
-      throw new Error('Vector type can only look up integers ' + index + ', ' + args)
+      throw new Error('Vector type can only look up integers')
     }
 
     let traversal = iavector.traverseGetOne(this.data, index)
@@ -42,9 +42,9 @@ Vector._type = _type
 
 async function * runConstruction (construction, codec) {
   while (true) {
-    let c = 0
+    let isConstructed = false
     for (let node of construction.construct()) {
-      c++
+      isConstructed = true
       let serializable = node.toSerializable()
       serializable._type = Vector._type
       let block = Block.encoder(serializable, codec)
@@ -52,7 +52,7 @@ async function * runConstruction (construction, codec) {
       node.id = await block.cid()
       construction.saved(node)
     }
-    if (c === 0) {
+    if (!isConstructed) {
       break
     }
   }

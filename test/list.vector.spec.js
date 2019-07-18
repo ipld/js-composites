@@ -19,14 +19,6 @@ function storage () {
   }
 }
 
-async function asyncList (iter) {
-  let parts = []
-  for await (let part of iter) {
-    parts.push(part)
-  }
-  return parts
-}
-
 const lookup = new Lookup()
 lookup.register(Vector._type, Vector)
 
@@ -41,9 +33,8 @@ describe('Vector', () => {
 
   it('create with CID values', async () => {
     let iter = Vector.create(cids, 3)
-    let trace = await asyncList(iter)
     let valueCount = 0
-    for (let block of trace) {
+    for await (let block of iter) {
       let d = block.decode()
       assert.ok(d.data.length <= 3)
       if (d.height === 0) {
@@ -55,9 +46,8 @@ describe('Vector', () => {
 
   it('create with inline values', async () => {
     let iter = Vector.create(fixture, 32)
-    let trace = await asyncList(iter)
     let valueCount = 0
-    for (let block of trace) {
+    for await (let block of iter) {
       let d = block.decode()
       assert.ok(d.data.length <= 32)
       if (d.height === 0) {
