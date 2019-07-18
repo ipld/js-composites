@@ -23,8 +23,8 @@ const lookup = new Lookup()
 lookup.register(Vector._type, Vector)
 
 describe('Vector', () => {
-  let fixture = Array.from({ length: 301 }).map((v, i) => { return { leafValue: `v${i}` } })
-  let blocks = fixture.map(b => Block.encoder(b, 'dag-cbor'))
+  const fixture = Array.from({ length: 301 }).map((v, i) => { return { leafValue: `v${i}` } })
+  const blocks = fixture.map(b => Block.encoder(b, 'dag-cbor'))
   let cids
 
   before(async () => {
@@ -32,33 +32,33 @@ describe('Vector', () => {
   })
 
   it('create with CID values', async () => {
-    let iter = Vector.create(cids, 3)
+    const iter = Vector.create(cids, 3)
     let valueCount = 0
     for await (let block of iter) {
-      let d = block.decode()
-      assert.ok(d.data.length <= 3)
-      if (d.height === 0) {
-        valueCount += d.data.length
+      const decoded = block.decode()
+      assert.ok(decoded.data.length <= 3)
+      if (decoded.height === 0) {
+        valueCount += decoded.data.length
       }
     }
     assert.strictEqual(valueCount, 301)
   })
 
   it('create with inline values', async () => {
-    let iter = Vector.create(fixture, 32)
+    const iter = Vector.create(fixture, 32)
     let valueCount = 0
     for await (let block of iter) {
-      let d = block.decode()
-      assert.ok(d.data.length <= 32)
-      if (d.height === 0) {
-        valueCount += d.data.length
+      const decoded = block.decode()
+      assert.ok(decoded.data.length <= 32)
+      if (decoded.height === 0) {
+        valueCount += decoded.data.length
       }
     }
     assert.strictEqual(valueCount, 301)
   })
 
   it('gets with CID values', async () => {
-    let store = storage()
+    const store = storage()
     await Promise.all(blocks.map(b => store.put(b)))
     let root
     for await (let block of Vector.create(cids, 3)) {
@@ -79,7 +79,7 @@ describe('Vector', () => {
   })
 
   it('gets with inline values', async () => {
-    let store = storage()
+    const store = storage()
     let root
     for await (let block of Vector.create(fixture, 32)) {
       root = block
@@ -87,7 +87,7 @@ describe('Vector', () => {
     }
 
     let result = await getPath(store, root, '0/leafValue')
-    let buffer = result.data
+    const buffer = result.data
     assert.strictEqual(buffer.toString(), 'v0')
 
     result = await getPath(store, root, '101/leafValue')

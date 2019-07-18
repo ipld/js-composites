@@ -11,13 +11,13 @@ class Vector extends Node {
 
   get (args) {
     let path = args.path.split('/').filter(Boolean)
-    let index = parseInt(path.shift(), 10)
+    const index = parseInt(path.shift(), 10)
 
     if (!Number.isInteger(index)) {
       throw new Error('Vector type can only look up integers')
     }
 
-    let traversal = iavector.traverseGetOne(this.data, index)
+    const traversal = iavector.traverseGetOne(this.data, index)
 
     if (!traversal) {
       throw new Error(`Vector does not contain index`)
@@ -28,8 +28,8 @@ class Vector extends Node {
         return { result: traversal.value }
       }
       // user wants to go deeper into returned object
-      let info = { method: 'get', args: { path: path.join('/') } }
-      let call = { info, target: traversal.value, proxy: true }
+      const info = { method: 'get', args: { path: path.join('/') } }
+      const call = { info, target: traversal.value, proxy: true }
       return { call }
     }
 
@@ -45,9 +45,9 @@ async function * runConstruction (construction, codec) {
     let isConstructed = false
     for (let node of construction.construct()) {
       isConstructed = true
-      let serializable = node.toSerializable()
+      const serializable = node.toSerializable()
       serializable._type = Vector._type
-      let block = Block.encoder(serializable, codec)
+      const block = Block.encoder(serializable, codec)
       yield block
       node.id = await block.cid()
       construction.saved(node)
@@ -59,14 +59,14 @@ async function * runConstruction (construction, codec) {
 }
 
 Vector.create = async function * create (from, width = 256, codec = 'dag-json') {
-  let construction = iavector.constructFrom(from, width)
+  const construction = iavector.constructFrom(from, width)
   yield * runConstruction(construction, codec)
 }
 
 /* WIP: Experimenting with mutation interface
 
 Vector.append = async function * append (block, value, codec = 'dag-json') {
-  let construction = iavector.constructAppend(block, value)
+  const construction = iavector.constructAppend(block, value)
   yield * runConstruction(construction, codec)
 }
 */
