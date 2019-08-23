@@ -1,6 +1,6 @@
 ## Operations
 
-This section describes only the operations for which there is currently an implementation. For a more exhaustive list of operations we may support in the future read [IPLD Multi-block Collections](/schema-layer/data-structures/multiblock-collections.md).
+This section describes only the operations for which there is currently an implementation. For a more exhaustive list of operations we may support in the future read [IPLD Multi-block Collections](https://github.com/ipld/specs/blob/master/schema-layer/data-structures/multiblock-collections.md).
 
 The term “leaf” is used often below. When an operation is performed on a node it may make any number of additional calls to operations on other data structures with many results being produced and passed into continuations. “leaf” responses are those that are from the original target operation and not from subsequent operations trigger by the original operation.
 
