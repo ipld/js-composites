@@ -1,3 +1,5 @@
+**This is an experiment and is not intended to be used in production and should not be considered the reference point for how advanced IPLD data structures will work in the future.**
+
 ## Operations
 
 This section describes only the operations for which there is currently an implementation. For a more exhaustive list of operations we may support in the future read [IPLD Multi-block Collections](https://github.com/ipld/specs/blob/master/schema-layer/data-structures/multiblock-collections.md).
